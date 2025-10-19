@@ -1,4 +1,4 @@
-const userModel = require("../Model/User_Schema");
+const userModel = require("../model/User_Schema");
 
 // ✅ Create a new user
 exports.createUser = async (userdata) => {

@@ -1,4 +1,4 @@
-const UserService = require ('../Service/User_Service')
+const UserService = require ('../service/User_Service')
 
 // ✅ Create User
 exports.createUser = async (req, res) => {
