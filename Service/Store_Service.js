@@ -1,14 +1,8 @@
-const Store = require('../model/Store_Schema')
+const Store = require("../model/Store_Schema");
 
 exports.createStore = async (storeData) => {
-  const {
-    store_name,
-    city,
-    address,
-    store_number,
-    opening_hours,
-    status,
-  } = storeData;
+  const { store_name, city, address, store_number, opening_hours, status } =
+    storeData;
 
   const count = await Store.countDocuments();
   const storeId = `STO-${count + 1}`;
