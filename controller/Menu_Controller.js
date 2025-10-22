@@ -1,6 +1,5 @@
 const menuService = require('../service/Menu_Service');
 
-// Create a new menu item
 exports.createMenu = async (req, res) => {
   try {
     const menuData = req.body;
@@ -18,7 +17,6 @@ exports.createMenu = async (req, res) => {
   }
 };
 
-// Get all menu items
 exports.getAllMenu = async (req, res) => {
   try {
     const menuList = await menuService.getAllMenu();
@@ -35,7 +33,6 @@ exports.getAllMenu = async (req, res) => {
   }
 };
 
-// Get menu item by productId
 exports.getMenuById = async (req, res) => {
   try {
     const { productId } = req.params;
@@ -52,7 +49,6 @@ exports.getMenuById = async (req, res) => {
   }
 };
 
-// Update menu item by productId
 exports.updateMenuById = async (req, res) => {
   try {
     const { productId } = req.params;
@@ -72,7 +68,6 @@ exports.updateMenuById = async (req, res) => {
   }
 };
 
-// Delete menu item by productId
 exports.deleteMenuById = async (req, res) => {
   try {
     const { productId } = req.params;

@@ -15,7 +15,7 @@ const menuSchema = new mongoose.Schema(
       type: Number,
     },
     add_ons: {
-      type: String,
+      type: [String],
     },
     last_updated: {
       type: Date,
