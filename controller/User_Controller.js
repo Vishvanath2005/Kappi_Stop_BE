@@ -1,6 +1,5 @@
 const UserService = require ('../service/User_Service')
 
-// ✅ Create User
 exports.createUser = async (req, res) => {
   try {
     const newUser = await UserService.createUser(req.body);
@@ -16,7 +15,6 @@ exports.createUser = async (req, res) => {
   }
 };
 
-// ✅ Update User by userId
 exports.updateUserByUserId = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -43,8 +41,6 @@ exports.updateUserByUserId = async (req, res) => {
   }
 };
 
-
-// ✅ Delete User by ID
 exports.deleteUserById = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -68,7 +64,6 @@ exports.deleteUserById = async (req, res) => {
   }
 };
 
-// ✅ Get All Users
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await UserService.getAllUsers();

@@ -1,9 +1,8 @@
+const User = require("../model/User_Schema");
 const userModel = require("../model/User_Schema");
 
-// ✅ Create a new user
 exports.createUser = async (userdata) => {
   const {
-    userId,
     name,
     phone,
     email,
@@ -21,21 +20,24 @@ exports.createUser = async (userdata) => {
     throw new Error("User already exists with this email or phone number");
   }
 
+  const count = await User.countDocuments();
+  const userId = `USR-${count + 1}`;
+
+
   // ✅ Create and save the new user
   const newUser = new userModel({
     userId,
     name,
     phone,
     email,
-    wallet_balance: wallet_balance || 0, // default to 0 if not provided
+    wallet_balance: wallet_balance || 0, 
     membership_type: membership_type || "free",
-    status: status || "active",
+    status: status || "Active",
   });
 
   return await newUser.save();
 };
 
-// ✅ Update user by userId
 exports.updateUserByUserId = async (userId, userdata) => {
   const updatedUser = await userModel.findOneAndUpdate(
     { userId }, // query by userId
@@ -53,7 +55,6 @@ exports.updateUserByUserId = async (userId, userdata) => {
   return updatedUser;
 };
 
-// ✅ Delete user by userId
 exports.deleteUserByUserId = async (userId) => {
   const deletedUser = await userModel.findOneAndDelete({ userId });
 
@@ -64,7 +65,6 @@ exports.deleteUserByUserId = async (userId) => {
   return deletedUser;
 };
 
-// ✅ Get all users
 exports.getAllUsers = async () => {
   return await userModel
     .find()
