@@ -8,7 +8,7 @@ const connectDB = async () => {
     const connectedDB = await mongoose.connect(
     `${MongoDBurl}`
     );
-    console.log(`DB is Connected to ${connectedDB.connection.port}`);
+    console.log(`DB is Connected`);
   } catch (error) {
     console.log("DB is not connected");
     process.exit(1);

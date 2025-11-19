@@ -1,4 +1,4 @@
-const offerService = require('../service/Offer_Service');
+const offerService = require('./Offer_Service');
 
 exports.createOffer = async (req, res) => {
   try {

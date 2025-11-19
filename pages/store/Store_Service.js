@@ -1,4 +1,4 @@
-const Store = require("../model/Store_Schema");
+const Store = require("./Store_Schema");
 
 exports.createStore = async (storeData) => {
   const { store_name, city, address, store_number, opening_hours, status } =

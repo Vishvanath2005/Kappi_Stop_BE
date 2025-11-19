@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const OfferController = require("../controller/Offer_Controller.js");
+const OfferController = require("./Offer_Controller.js");
 
 router.post("/createoffer", OfferController.createOffer);
 router.get("/getalloffers", OfferController.getAllOffers);

@@ -1,4 +1,4 @@
-const attractionService = require('../service/Attraction_Service');
+const attractionService = require('./Attraction_Service');
 
 exports.createAttraction = async (req, res) => {
   try {

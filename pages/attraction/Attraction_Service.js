@@ -1,4 +1,4 @@
-const Attraction = require('../model/Attraction_Schema');
+const Attraction = require('./Attraction_Schema');
 
 exports.createAttraction = async (attractionData) => {
   const { title, city, linked_store, status } = attractionData;

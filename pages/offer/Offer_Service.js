@@ -1,4 +1,4 @@
-const Offer = require("../model/Offer_Schema");
+const Offer = require("./Offer_Schema");
 
 exports.createOffer = async (offerData) => {
   const {

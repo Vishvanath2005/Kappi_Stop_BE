@@ -1,11 +1,11 @@
 const express = require('express')
 const cors = require('cors')
 const DBconnection = require("./config/db")
-const User_Route =  require("./router/User_Route")
-const Store_Route = require("./router/Store_Route")
-const Menu_Route = require('./router/Menu_Route')
-const Offer_Route = require('./router/Offer_Route')
-const Attraction_Route = require('./router/Attraction_Route')
+const User_Route =  require("./pages/user/User_Route")
+const Store_Route = require("./pages/store/Store_Route")
+const Menu_Route = require('./pages/menu/Menu_Route')
+const Offer_Route = require('./pages/offer/Offer_Route')
+const Attraction_Route = require('./pages/attraction/Attraction_Route')
 
 const app = express()
 DBconnection();

@@ -1,7 +1,7 @@
-const Menu = require("../model/Menu_Schema");
+const Menu = require("./Menu_Schema");
 
 exports.createMenu = async (menuData) => {
-  const { product_name, category, price, add_ons, status } = menuData;
+  const { product_name, category, price, add_ons,available_store, status } = menuData;
 
   const count = await Menu.countDocuments();
   const productId = `PRO-${count + 1}`;
@@ -14,6 +14,7 @@ exports.createMenu = async (menuData) => {
   const newMenu = new Menu({
     productId,
     product_name,
+    available_store,
     category: category || "Uncategorized",
     price: price || 0,
     add_ons: add_ons || [],
@@ -39,7 +40,7 @@ exports.getMenuById = async (productId) => {
 };
 
 exports.updateMenuById = async (productId, menuData) => {
-  menuData.last_updated = new Date(); // update timestamp
+  menuData.last_updated = new Date(); 
 
   const updatedMenu = await Menu.findOneAndUpdate({ productId }, menuData, {
     new: true,

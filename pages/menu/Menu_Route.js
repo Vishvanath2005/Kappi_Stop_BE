@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const MenuController = require("../controller/Menu_Controller.js");
+const MenuController = require("./Menu_Controller.js");
 
 router.post("/createmenu", MenuController.createMenu);
 router.get("/getallmenu", MenuController.getAllMenu);

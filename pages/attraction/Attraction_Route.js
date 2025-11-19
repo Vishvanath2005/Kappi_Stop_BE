@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const AttractionController = require("../controller/Attraction_Controller.js");
+const AttractionController = require("./Attraction_Controller.js");
 
 router.post("/createattraction", AttractionController.createAttraction);
 router.get("/getallattractions", AttractionController.getAllAttractions);

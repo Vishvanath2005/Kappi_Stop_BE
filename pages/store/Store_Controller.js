@@ -1,4 +1,4 @@
-const StoreService = require("../service/Store_Service");
+const StoreService = require("./Store_Service");
 
 exports.createStore = async (req, res) => {
   try {
