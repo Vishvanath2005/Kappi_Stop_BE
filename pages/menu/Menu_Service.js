@@ -1,7 +1,16 @@
 const Menu = require("./Menu_Schema");
 
 exports.createMenu = async (menuData) => {
-  const { product_name, category, price, add_ons,available_store, status } = menuData;
+  const {
+    product_name,
+    product_img,
+    category,
+    price,
+    add_ons,
+    available_store,
+    type,
+    status,
+  } = menuData;
 
   const count = await Menu.countDocuments();
   const productId = `PRO-${count + 1}`;
@@ -14,7 +23,9 @@ exports.createMenu = async (menuData) => {
   const newMenu = new Menu({
     productId,
     product_name,
+    product_img,
     available_store,
+    type: type || "none",
     category: category || "Uncategorized",
     price: price || 0,
     add_ons: add_ons || [],
@@ -27,7 +38,19 @@ exports.createMenu = async (menuData) => {
 
 exports.getAllMenu = async () => {
   return await Menu.find().select(
-    "productId product_name category price add_ons last_updated status"
+    "productId product_name category price add_ons available_store type last_updated status"
+  );
+};
+
+exports.getMenuByFilters = async (storeId, category, type) => {
+  const query = {};
+
+  if (storeId) query.available_store = storeId;
+  if (category) query.category = category;
+  if (type) query.type = type;
+
+  return await Menu.find(query).select(
+    "productId product_name category price add_ons available_store type last_updated status"
   );
 };
 
@@ -40,7 +63,7 @@ exports.getMenuById = async (productId) => {
 };
 
 exports.updateMenuById = async (productId, menuData) => {
-  menuData.last_updated = new Date(); 
+  menuData.last_updated = new Date();
 
   const updatedMenu = await Menu.findOneAndUpdate({ productId }, menuData, {
     new: true,

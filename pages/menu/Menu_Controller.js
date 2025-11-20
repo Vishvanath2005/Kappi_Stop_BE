@@ -1,9 +1,15 @@
-const menuService = require('./Menu_Service');
+const menuService = require("./Menu_Service");
 
 exports.createMenu = async (req, res) => {
   try {
     const menuData = req.body;
+
+    if (req.file) {
+      menuData.product_img = req.file.path;
+    }
+
     const newMenu = await menuService.createMenu(menuData);
+
     res.status(201).json({
       success: true,
       message: "Menu item created successfully",
@@ -20,23 +26,39 @@ exports.createMenu = async (req, res) => {
 exports.getAllMenu = async (req, res) => {
   try {
     const menuList = await menuService.getAllMenu();
+
     res.status(200).json({
       success: true,
       count: menuList.length,
       data: menuList,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message || "Failed to fetch menu items",
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
+
+exports.getMenuByFilters = async (req, res) => {
+  try {
+    const { storeId, category, type } = req.params;
+
+    const menuList = await menuService.getMenuByFilters(storeId, category, type);
+
+    res.status(200).json({
+      success: true,
+      count: menuList.length,
+      data: menuList,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 
 exports.getMenuById = async (req, res) => {
   try {
     const { productId } = req.params;
     const menu = await menuService.getMenuById(productId);
+
     res.status(200).json({
       success: true,
       data: menu,
@@ -53,7 +75,15 @@ exports.updateMenuById = async (req, res) => {
   try {
     const { productId } = req.params;
     const updatedData = req.body;
-    const updatedMenu = await menuService.updateMenuById(productId, updatedData);
+
+    if (req.file) {
+      updatedData.product_img = req.file.path;
+    }
+
+    const updatedMenu = await menuService.updateMenuById(
+      productId,
+      updatedData
+    );
 
     res.status(200).json({
       success: true,

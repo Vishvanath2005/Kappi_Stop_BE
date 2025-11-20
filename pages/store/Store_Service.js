@@ -19,7 +19,7 @@ exports.createStore = async (storeData) => {
     address: address || "Not Provided",
     store_number,
     opening_hours: opening_hours || "09:00 AM - 09:00 PM",
-    status: status || "active",
+    status: status || "Active",
   });
 
   return await newStore.save();
