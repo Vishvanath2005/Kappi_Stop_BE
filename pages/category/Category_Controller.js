@@ -4,8 +4,10 @@ exports.createCategory = async (req, res) => {
   try {
     const data = req.body;
 
+    // Convert file to Base64 and store in DB
     if (req.file) {
-      data.category_img = req.file.path;
+      const base64Image = req.file.buffer.toString("base64");
+      data.category_img = `data:${req.file.mimetype};base64,${base64Image}`;
     }
 
     const newCategory = await categoryService.createCategory(data);
@@ -19,6 +21,7 @@ exports.createCategory = async (req, res) => {
     res.status(400).json({ success: false, message: error.message });
   }
 };
+
 
 exports.getAllCategory = async (req, res) => {
   try {

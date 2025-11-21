@@ -1,7 +1,25 @@
 const Category = require("./Category_Schema.js");
 
 exports.createCategory = async (data) => {
-  const { category_name, category_img, type } = data;
+  let { category_name, category_img, type } = data;
+
+  // Normalize type to always be an array
+  if (!type) {
+    type = [];
+  }
+
+  // If type is a string (from frontend), convert to array
+  if (typeof type === "string") {
+    type = type.split(",").map(item => item.trim());
+  }
+
+  // 🔥 Remove empty strings
+  type = type.filter(item => item !== "");
+
+  // If only empty values existed → type becomes []
+  if (type.length === 0) {
+    type = [];
+  }
 
   const exists = await Category.findOne({ category_name });
   if (exists) {
@@ -16,6 +34,7 @@ exports.createCategory = async (data) => {
 
   return await newCategory.save();
 };
+
 
 exports.getAllCategory = async () => {
   return await Category.find();
