@@ -11,6 +11,8 @@ router.post(
 router.get("/getallmenu", MenuController.getAllMenu);
 router.get("/getmenu/:productId", MenuController.getMenuById);
 router.get("/store/:storeId", MenuController.getMenuByFilters);
+router.get("/store/:storeId/categories", MenuController.getCategoriesByStore);
+
 router.get(
   "/store/:storeId/category/:category",
   MenuController.getMenuByFilters

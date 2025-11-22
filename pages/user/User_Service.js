@@ -22,9 +22,7 @@ exports.createUser = async (userdata) => {
 
   const count = await User.countDocuments();
   const userId = `USR-${count + 1}`;
-
-
-  // ✅ Create and save the new user
+ 
   const newUser = new userModel({
     userId,
     name,

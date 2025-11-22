@@ -57,6 +57,26 @@ exports.getMenuByFilters = async (req, res) => {
   }
 };
 
+exports.getCategoriesByStore = async (req, res) => {
+  try {
+    const { storeId } = req.params;
+
+    const categories = await menuService.getCategoriesByStore(storeId);
+
+    res.status(200).json({
+      success: true,
+      count: categories.length,
+      categories,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+
 exports.getMenuById = async (req, res) => {
   try {
     const { productId } = req.params;

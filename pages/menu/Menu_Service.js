@@ -42,6 +42,17 @@ exports.getAllMenu = async () => {
   );
 };
 
+exports.getCategoriesByStore = async (storeId) => {
+  const menuList = await Menu.find({ available_store: storeId }).select(
+    "category"
+  );
+
+  const categories = [...new Set(menuList.map((item) => item.category))];
+
+  return categories;
+};
+
+
 exports.getMenuByFilters = async (storeId, category, type) => {
   const query = {};
 

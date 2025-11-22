@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const UserSchema = new mongoose.Schema(
   {
     userId: {
-      type: String
+      type: String,
     },
     name: {
       type: String,
@@ -21,6 +21,9 @@ const UserSchema = new mongoose.Schema(
       type: String,
     },
     role: {
+      type: String,
+    },
+    created_By: {
       type: String,
     },
     status: {
