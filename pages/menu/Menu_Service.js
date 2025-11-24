@@ -1,4 +1,5 @@
 const Menu = require("./Menu_Schema");
+const Category = require("../category/Category_Schema");
 
 exports.createMenu = async (menuData) => {
   const {
@@ -43,11 +44,13 @@ exports.getAllMenu = async () => {
 };
 
 exports.getCategoriesByStore = async (storeId) => {
-  const menuList = await Menu.find({ available_store: storeId }).select(
-    "category"
-  );
+  const menuList = await Menu.find({ available_store: storeId }).select("category");
 
-  const categories = [...new Set(menuList.map((item) => item.category))];
+  const categoryNames = [...new Set(menuList.map(item => item.category))];
+
+  const categories = await Category.find({
+    category_name: { $in: categoryNames }
+  }).select("category_name category_img ");
 
   return categories;
 };
@@ -61,7 +64,7 @@ exports.getMenuByFilters = async (storeId, category, type) => {
   if (type) query.type = type;
 
   return await Menu.find(query).select(
-    "productId product_name category price add_ons available_store type last_updated status"
+    "productId product_name category price add_ons type last_updated status"
   );
 };
 

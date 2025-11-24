@@ -1,14 +1,13 @@
 const mongoose = require("mongoose");
 
-const UserSchema = new mongoose.Schema(
+const memberSchema = new mongoose.Schema(
   {
-    userId: {
+    memberId: {
       type: String,
-      required: true,
       unique: true,
-      trim: true,
+      required: true,
     },
-    user_name: {
+    member_name: {
       type: String,
       required: true,
       trim: true,
@@ -26,30 +25,30 @@ const UserSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
-    wallet_balance: {
-      type: Number,
-      default: 0,
-    },
-    membership_type: {
+    member_password: {
       type: String,
-      default: "Standard",
+      required: true,
+    },
+    role: {
+      type: String,
+      required: true,
+    },
+    store: {
+      type: [String],
+      required: true,
+      trim: true,
     },
     created_by: {
       type: String,
       required: true,
     },
-
-    store: {
-      type: String,
-      required: true,
-    },
-
     status: {
       type: String,
-      default: "Active",
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
-module.exports = mongoose.model("User", UserSchema);
+module.exports = mongoose.model("Member", memberSchema);

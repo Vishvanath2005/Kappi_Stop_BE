@@ -2,16 +2,14 @@ const User = require("./User_Schema");
 const userModel = require("./User_Schema");
 
 exports.createUser = async (userdata) => {
-  const {
-    name,
-    phone,
-    email,
-    wallet_balance,
-    membership_type,
-    status,
-  } = userdata;
+  const { user_name, phone, email,store,created_by} = userdata;
 
-  // ✅ Check if email or phone already exists
+  // Validate required fields
+  if (!user_name || !phone || !email) {
+    throw new Error("Name, phone, and email are required");
+  }
+
+  // Check duplicate
   const existingUser = await userModel.findOne({
     $or: [{ email }, { phone }],
   });
@@ -20,17 +18,22 @@ exports.createUser = async (userdata) => {
     throw new Error("User already exists with this email or phone number");
   }
 
-  const count = await User.countDocuments();
+  // Auto-generate userId
+  const count = await userModel.countDocuments();
   const userId = `USR-${count + 1}`;
- 
+
+  // Create user including user_pic
   const newUser = new userModel({
     userId,
-    name,
+    user_name,
     phone,
     email,
-    wallet_balance: wallet_balance || 0, 
-    membership_type: membership_type || "free",
-    status: status || "Active",
+    user_pic: "",  
+    wallet_balance: 0,
+    membership_type: "free",    
+    created_by: created_by,      
+    store: store,  
+    status: "Active",
   });
 
   return await newUser.save();
@@ -38,7 +41,7 @@ exports.createUser = async (userdata) => {
 
 exports.updateUserByUserId = async (userId, userdata) => {
   const updatedUser = await userModel.findOneAndUpdate(
-    { userId }, // query by userId
+    { userId },
     userdata,
     {
       new: true,
