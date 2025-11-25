@@ -4,10 +4,16 @@ exports.createCategory = async (req, res) => {
   try {
     const data = req.body;
 
-    // Convert file to Base64 and store in DB
+    // Parse JSON array sent from FormData
+    if (data.type) {
+      data.type = JSON.parse(data.type);
+    }
+
+    // Save uploaded image
     if (req.file) {
-      const base64Image = req.file.buffer.toString("base64");
-      data.category_img = `data:${req.file.mimetype};base64,${base64Image}`;
+      data.category_img = `${req.protocol}://${req.get(
+        "host"
+      )}/uploads/category/${req.file.filename}`;
     }
 
     const newCategory = await categoryService.createCategory(data);
@@ -21,7 +27,6 @@ exports.createCategory = async (req, res) => {
     res.status(400).json({ success: false, message: error.message });
   }
 };
-
 
 exports.getAllCategory = async (req, res) => {
   try {
@@ -45,8 +50,16 @@ exports.updateCategory = async (req, res) => {
   try {
     const data = req.body;
 
+    // Parse JSON
+    if (data.type) {
+      data.type = JSON.parse(data.type);
+    }
+
+    // If image updated
     if (req.file) {
-      data.category_img = req.file.path;
+      data.category_img = `${req.protocol}://${req.get(
+        "host"
+      )}/uploads/category/${req.file.filename}`;
     }
 
     const updated = await categoryService.updateCategory(req.params.id, data);

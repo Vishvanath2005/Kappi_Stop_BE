@@ -2,31 +2,35 @@ const mongoose = require("mongoose");
 
 const storeSchema = new mongoose.Schema(
   {
-    storeId: {
-      type: String
-    },
-    store_name: {
-      type: String,
-    },
-    city: {
-      type: String,
-    },
-    address: {
-      type: String,
-    },
-    store_number: {
+    storeId: { type: String },
+
+    store_name: { type: String },
+
+    city: { type: String },
+
+    address: { type: String },
+
+    store_number: { type: Number },
+
+    opening_hours: { type: String },
+
+    status: { type: String },
+
+    latitude: {
       type: Number,
+      required: true,
     },
-    opening_hours: {
-      type: String,
+    longitude: {
+      type: Number,
+      required: true,
     },
-    status: {
-      type: String,
+
+    serviceRadiusMeters: {
+      type: Number,
+      default: 5000,
     },
   },
   { timestamps: true }
 );
 
-const Store = mongoose.model("Store", storeSchema);
-
-module.exports = Store;
+module.exports = mongoose.model("Store", storeSchema);

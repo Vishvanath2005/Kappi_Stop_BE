@@ -5,9 +5,9 @@ exports.createMenu = async (req, res) => {
     const menuData = req.body;
 
     if (req.file) {
-      const base64Image = req.file.buffer.toString("base64");
-      menuData.product_img = `data:${req.file.mimetype};base64,${base64Image}`;
+      menuData.product_img = `${req.protocol}://${req.get("host")}/uploads/menu_items/${req.file.filename}`;
     }
+
     const newMenu = await menuService.createMenu(menuData);
 
     res.status(201).json({
@@ -22,6 +22,7 @@ exports.createMenu = async (req, res) => {
     });
   }
 };
+
 
 exports.getAllMenu = async (req, res) => {
   try {
@@ -75,7 +76,6 @@ exports.getCategoriesByStore = async (req, res) => {
     });
   }
 };
-
 
 exports.getMenuById = async (req, res) => {
   try {
