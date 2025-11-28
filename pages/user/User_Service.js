@@ -1,5 +1,5 @@
 const User = require("./User_Schema");
-const StoreService = require("../store/Store_Service")
+const StoreService = require("../store/Store_Service");
 
 exports.createUser = async (userdata) => {
   const { phone } = userdata;
@@ -9,7 +9,7 @@ exports.createUser = async (userdata) => {
   if (existing) return existing;
 
   const lastUser = await User.findOne({})
-    .sort({ userId: -1 }) 
+    .sort({ userId: -1 })
     .collation({ locale: "en_US", numericOrdering: true });
 
   let nextNumber = 1;
@@ -45,7 +45,6 @@ exports.getUserByPhone = async (phone) => {
   return await User.findOne({ phone });
 };
 
-// update only location and assign nearest store
 exports.updateCurrentLocation = async (userId, latitude, longitude) => {
   const user = await User.findOne({ userId });
   if (!user) throw new Error("User not found");
@@ -72,31 +71,25 @@ exports.updateCurrentLocation = async (userId, latitude, longitude) => {
 
   return user;
 };
+//   const user = await User.findOne({ userId });
+//   if (!user) throw new Error("User not found");
 
-exports.getUserByPhone = async (phone) => {
-  return await User.findOne({ phone });
-};
+//   const { latitude, longitude } = user.current_location || {};
+//   if (!latitude || !longitude) throw new Error("User current location not set");
 
-exports.assignNearestStore = async (userId) => {
-  const user = await User.findOne({ userId });
-  if (!user) throw new Error("User not found");
+//   const nearestStores = await StoreService.getStoresNearLocation(
+//     latitude,
+//     longitude,
+//     10000,
+//     1
+//   );
 
-  const { latitude, longitude } = user.current_location || {};
-  if (!latitude || !longitude) throw new Error("User current location not set");
+//   if (!nearestStores.length) throw new Error("No nearby stores");
 
-  const nearestStores = await StoreService.getStoresNearLocation(
-    latitude,
-    longitude,
-    10000,
-    1
-  );
-
-  if (!nearestStores.length) throw new Error("No nearby stores");
-
-  user.store = nearestStores[0].storeId;
-  await user.save();
-  return user;
-};
+//   user.store = nearestStores[0].storeId;
+//   await user.save();
+//   return user;
+// };
 
 exports.addAddress = async (userId, addressData) => {
   const user = await User.findOne({ userId });
@@ -111,46 +104,6 @@ exports.addAddress = async (userId, addressData) => {
   return user;
 };
 
-exports.updateLocationAndAssignStore = async (userId, latitude, longitude) => {
-  const user = await User.findOne({ userId });
-  if (!user) throw new Error("User not found");
-
-  user.current_location = {
-    latitude,
-    longitude,
-    updated_at: new Date(),
-  };
-
-  await user.save();
-
-  const nearestStores = await StoreService.getStoresNearLocation(
-    latitude,
-    longitude,
-    10000,
-    1
-  );
-
-  if (nearestStores.length > 0) {
-    user.store = nearestStores[0].storeId;
-    await user.save();
-  }
-
-  return user;
-};
-
-exports.updateCurrentLocation = async (userId, latitude, longitude) => {
-  const user = await User.findOne({ userId });
-  if (!user) throw new Error("User not found");
-
-  user.current_location = {
-    latitude,
-    longitude,
-    updated_at: new Date(),
-  };
-
-  await user.save();
-  return user;
-};
 
 exports.getAllUsers = async () => {
   return await User.find();

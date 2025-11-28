@@ -92,22 +92,6 @@ exports.loginUser = async (req, res) => {
   }
 };
 
-exports.assignNearestStore = async (req, res) => {
-  try {
-    const { userId } = req.params;
-    const updatedUser = await UserService.assignNearestStore(userId);
-    res.status(200).json({
-      message: "Nearest store assigned successfully",
-      data: updatedUser,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: "Failed to assign store",
-      error: error.message,
-    });
-  }
-};
-
 exports.addAddress = async (req, res) => {
   try {
     const { userId } = req.params;

@@ -5,7 +5,6 @@ const UserController = require("./User_Controller");
 router.post("/createuser", UserController.createUser);
 router.post("/:userId/current_location", UserController.updateCurrentLocation);
 router.post("/login", UserController.loginUser);
-router.post("/:userId/assign_store", UserController.assignNearestStore);
 router.post("/:userId/address", UserController.addAddress);
 
 router.get("/all", UserController.getAllUsers);
