@@ -1,110 +1,178 @@
 const User = require("./User_Schema");
-const userModel = require("./User_Schema");
+const StoreService = require("../store/Store_Service")
 
 exports.createUser = async (userdata) => {
   const { phone } = userdata;
+  if (!phone) throw new Error("Phone number is required");
 
-  if (!phone) {
-    throw new Error("Phone number is required");
+  let existing = await User.findOne({ phone });
+  if (existing) return existing;
+
+  const lastUser = await User.findOne({})
+    .sort({ userId: -1 }) 
+    .collation({ locale: "en_US", numericOrdering: true });
+
+  let nextNumber = 1;
+
+  if (lastUser && lastUser.userId) {
+    const lastNumber = parseInt(lastUser.userId.split("-")[1], 10);
+    nextNumber = lastNumber + 1;
   }
 
-  let existingUser = await userModel.findOne({ phone });
-  if (existingUser) {
-    return existingUser;
-  }
+  const userId = `USR-${nextNumber}`;
 
-  const count = await userModel.countDocuments();
-  const userId = `USR-${count + 1}`;
-
-  const newUser = new userModel({
+  const newUser = new User({
     userId,
+    user_name: userdata.user_name || "",
     phone,
-    user_name: userdata.user_name || "Guest User",
     email: userdata.email || `user${Date.now()}@example.com`,
-    store: userdata.store || null,
-
-    wallet_balance: 0,
+    user_img: userdata.user_img || null,
+    current_location: {
+      latitude: null,
+      longitude: null,
+      updated_at: null,
+    },
+    store: null,
     membership_type: "Standard",
     status: "Active",
-
-    address: {
-      home: {
-        address_name: userdata?.address?.home?.address_name || null,
-        latitude: userdata?.address?.home?.latitude || null,
-        longitude: userdata?.address?.home?.longitude || null,
-      },
-      work: {
-        address_name: userdata?.address?.work?.address_name || null,
-        latitude: userdata?.address?.work?.latitude || null,
-        longitude: userdata?.address?.work?.longitude || null,
-      },
-    },
+    address: [],
   });
 
   return await newUser.save();
 };
 
-exports.addHomeAddress = async (userId, addressData) => {
-  const user = await userModel.findOne({ userId });
+exports.getUserByPhone = async (phone) => {
+  return await User.findOne({ phone });
+};
 
-  if (!user) {
-    throw new Error("User not found");
-  }
+// update only location and assign nearest store
+exports.updateCurrentLocation = async (userId, latitude, longitude) => {
+  const user = await User.findOne({ userId });
+  if (!user) throw new Error("User not found");
 
-  user.address.home = {
-    address_name: addressData.address_name || null,
-    latitude: addressData.latitude || null,
-    longitude: addressData.longitude || null,
+  user.current_location = {
+    latitude,
+    longitude,
+    updated_at: new Date(),
   };
 
+  await user.save();
+
+  const nearestStores = await StoreService.getStoresNearLocation(
+    latitude,
+    longitude,
+    10000,
+    1
+  );
+
+  if (nearestStores.length > 0) {
+    user.store = nearestStores[0].storeId;
+    await user.save();
+  }
+
+  return user;
+};
+
+exports.getUserByPhone = async (phone) => {
+  return await User.findOne({ phone });
+};
+
+exports.assignNearestStore = async (userId) => {
+  const user = await User.findOne({ userId });
+  if (!user) throw new Error("User not found");
+
+  const { latitude, longitude } = user.current_location || {};
+  if (!latitude || !longitude) throw new Error("User current location not set");
+
+  const nearestStores = await StoreService.getStoresNearLocation(
+    latitude,
+    longitude,
+    10000,
+    1
+  );
+
+  if (!nearestStores.length) throw new Error("No nearby stores");
+
+  user.store = nearestStores[0].storeId;
   await user.save();
   return user;
 };
 
-exports.addWorkAddress = async (userId, addressData) => {
-  const user = await userModel.findOne({ userId });
+exports.addAddress = async (userId, addressData) => {
+  const user = await User.findOne({ userId });
+  if (!user) throw new Error("User not found");
 
-  if (!user) {
-    throw new Error("User not found");
-  }
-
-  user.address.work = {
-    address_name: addressData.address_name || null,
-    latitude: addressData.latitude || null,
-    longitude: addressData.longitude || null,
-  };
-
-  await user.save();
-  return user;
-};
-
-exports.updateUserByUserId = async (userId, userdata) => {
-  const updatedUser = await userModel.findOneAndUpdate({ userId }, userdata, {
-    new: true,
-    runValidators: true,
+  user.address.push({
+    name: addressData.name,
+    location: addressData.location,
   });
 
-  if (!updatedUser) {
-    throw new Error("User not found");
-  }
-
-  return updatedUser;
+  await user.save();
+  return user;
 };
 
-exports.deleteUserByUserId = async (userId) => {
-  const deletedUser = await userModel.findOneAndDelete({ userId });
+exports.updateLocationAndAssignStore = async (userId, latitude, longitude) => {
+  const user = await User.findOne({ userId });
+  if (!user) throw new Error("User not found");
 
-  if (!deletedUser) {
-    throw new Error("User not found");
+  user.current_location = {
+    latitude,
+    longitude,
+    updated_at: new Date(),
+  };
+
+  await user.save();
+
+  const nearestStores = await StoreService.getStoresNearLocation(
+    latitude,
+    longitude,
+    10000,
+    1
+  );
+
+  if (nearestStores.length > 0) {
+    user.store = nearestStores[0].storeId;
+    await user.save();
   }
 
-  return deletedUser;
+  return user;
+};
+
+exports.updateCurrentLocation = async (userId, latitude, longitude) => {
+  const user = await User.findOne({ userId });
+  if (!user) throw new Error("User not found");
+
+  user.current_location = {
+    latitude,
+    longitude,
+    updated_at: new Date(),
+  };
+
+  await user.save();
+  return user;
 };
 
 exports.getAllUsers = async () => {
-  return await userModel
-    .find()
-    .select(
-      "userId name phone email wallet_balance membership_type role status"
-    );
+  return await User.find();
+};
+
+exports.getUserById = async (userId) => {
+  const user = await User.findOne({ userId });
+  if (!user) throw new Error("User not found");
+  return user;
+};
+
+exports.updateUserById = async (userId, updateData) => {
+  const updated = await User.findOneAndUpdate({ userId }, updateData, {
+    new: true,
+    runValidators: true,
+  });
+  if (!updated) throw new Error("User not found");
+  return updated;
+};
+
+exports.deleteUserById = async (userId) => {
+  const deleted = await User.findOneAndDelete({ userId });
+  if (!deleted) throw new Error("User not found");
+  return deleted;
 };

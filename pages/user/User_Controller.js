@@ -2,144 +2,123 @@ const UserService = require("./User_Service");
 
 exports.createUser = async (req, res) => {
   try {
-    const body = req.body;
+    const { phone } = req.body;
 
-    const address = {
-      home: {
-        address_name: body?.address?.home?.address_name || null,
-        latitude: body?.address?.home?.latitude || null,
-        longitude: body?.address?.home?.longitude || null,
-      },
-      work: {
-        address_name: body?.address?.work?.address_name || null,
-        latitude: body?.address?.work?.latitude || null,
-        longitude: body?.address?.work?.longitude || null,
-      },
-    };
+    if (!phone) {
+      return res.status(400).json({ message: "Phone is required" });
+    }
 
-    const userPayload = {
-      ...body,
-      address,
-    };
-
-    const newUser = await UserService.createUser(userPayload);
+    const user = await UserService.createUser({
+      phone
+    });
 
     res.status(201).json({
-      message: "User Created Successfully",
-      data: newUser,
+      message: "User created / fetched successfully",
+      data: user,
     });
   } catch (error) {
     res.status(500).json({
-      message: "Internal Server Error",
+      message: "Error creating user",
       error: error.message,
     });
   }
 };
 
-
-exports.addHomeAddress = async (req, res) => {
+exports.updateCurrentLocation = async (req, res) => {
   try {
     const { userId } = req.params;
+    const { latitude, longitude } = req.body;
 
-    const updatedUser = await UserService.addHomeAddress(userId, req.body);
-
-    return res.status(200).json({
-      message: "Home Address Updated Successfully",
-      data: updatedUser,
-    });
-  } catch (error) {
-    if (error.message === "User not found") {
-      return res.status(404).json({ message: "User Not Found" });
+    if (latitude == null || longitude == null) {
+      return res
+        .status(400)
+        .json({ message: "latitude and longitude are required" });
     }
 
-    return res.status(500).json({
-      message: "Internal Server Error",
-      error: error.message,
-    });
-  }
-};
-
-
-exports.addWorkAddress = async (req, res) => {
-  try {
-    const { userId } = req.params;
-
-    const updatedUser = await UserService.addWorkAddress(userId, req.body);
-
-    return res.status(200).json({
-      message: "Work Address Updated Successfully",
-      data: updatedUser,
-    });
-  } catch (error) {
-    if (error.message === "User not found") {
-      return res.status(404).json({ message: "User Not Found" });
-    }
-
-    return res.status(500).json({
-      message: "Internal Server Error",
-      error: error.message,
-    });
-  }
-};
-
-exports.updateUserByUserId = async (req, res) => {
-  try {
-    const { userId } = req.params;
-    const body = req.body;
-    let updateData = { ...body };
-
-    if (body.address) {
-      updateData.address = {
-        home: {
-          address_name: body?.address?.home?.address_name,
-          latitude: body?.address?.home?.latitude,
-          longitude: body?.address?.home?.longitude,
-        },
-        work: {
-          address_name: body?.address?.work?.address_name,
-          latitude: body?.address?.work?.latitude,
-          longitude: body?.address?.work?.longitude,
-        },
-      };
-    }
-
-    const updatedUser = await UserService.updateUserByUserId(
+    const updatedUser = await UserService.updateCurrentLocation(
       userId,
-      updateData
+      latitude,
+      longitude
     );
 
     res.status(200).json({
-      message: "User Updated Successfully",
+      message: "Current location updated successfully",
       data: updatedUser,
     });
   } catch (error) {
-    if (error.message === "User not found") {
-      return res.status(404).json({ message: "User Not Found" });
-    }
-
     res.status(500).json({
-      message: "Internal Server Error",
+      message: "Error updating location",
       error: error.message,
     });
   }
 };
 
-exports.deleteUserById = async (req, res) => {
+exports.loginUser = async (req, res) => {
   try {
-    const { userId } = req.params;
-    const deletedUser = await UserService.deleteUserByUserId(userId);
+    const { phone, current_location } = req.body;
 
-    if (!deletedUser) {
-      return res.status(404).json({ message: "User Not Found" });
+    if (!phone) {
+      return res.status(400).json({ message: "Phone is required" });
+    }
+
+    let user = await UserService.getUserByPhone(phone);
+
+    if (!user) {
+      user = await UserService.createUser({
+        phone,
+        current_location,
+      });
+    }
+
+    let updatedUser = user;
+
+    if (current_location?.latitude && current_location?.longitude) {
+      updatedUser = await UserService.updateLocationAndAssignStore(
+        user.userId,
+        current_location.latitude,
+        current_location.longitude
+      );
     }
 
     res.status(200).json({
-      message: "User Deleted Successfully",
-      data: deletedUser,
+      message: "Login successful",
+      data: updatedUser,
     });
   } catch (error) {
     res.status(500).json({
-      message: "Internal Server Error",
+      message: "Error logging in",
+      error: error.message,
+    });
+  }
+};
+
+exports.assignNearestStore = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const updatedUser = await UserService.assignNearestStore(userId);
+    res.status(200).json({
+      message: "Nearest store assigned successfully",
+      data: updatedUser,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to assign store",
+      error: error.message,
+    });
+  }
+};
+
+exports.addAddress = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await UserService.addAddress(userId, req.body);
+    res.status(200).json({
+      message: "Address added successfully",
+      data: user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error adding address",
       error: error.message,
     });
   }
@@ -148,15 +127,62 @@ exports.deleteUserById = async (req, res) => {
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await UserService.getAllUsers();
-
     res.status(200).json({
-      message: "Users Retrieved Successfully",
+      message: "Users retrieved successfully",
       count: users.length,
       data: users,
     });
   } catch (error) {
     res.status(500).json({
-      message: "Internal Server Error",
+      message: "Error fetching users",
+      error: error.message,
+    });
+  }
+};
+
+exports.getUserById = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await UserService.getUserById(userId);
+    res.status(200).json({
+      message: "User retrieved successfully",
+      data: user,
+    });
+  } catch (error) {
+    res.status(404).json({
+      message: "User not found",
+      error: error.message,
+    });
+  }
+};
+
+exports.updateUserById = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const updatedUser = await UserService.updateUserById(userId, req.body);
+    res.status(200).json({
+      message: "User updated successfully",
+      data: updatedUser,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error updating user",
+      error: error.message,
+    });
+  }
+};
+
+exports.deleteUserById = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const deletedUser = await UserService.deleteUserById(userId);
+    res.status(200).json({
+      message: "User deleted successfully",
+      data: deletedUser,
+    });
+  } catch (error) {
+    res.status(404).json({
+      message: "User not found",
       error: error.message,
     });
   }

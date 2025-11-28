@@ -3,10 +3,15 @@ const router = express.Router();
 const UserController = require("./User_Controller");
 
 router.post("/createuser", UserController.createUser);
-router.post("/:userId/address/home", UserController.addHomeAddress);
-router.post("/:userId/address/work", UserController.addWorkAddress);
-router.put("/updateuserbyid/:userId", UserController.updateUserByUserId);
-router.delete("/deleteuserbyid/:userId", UserController.deleteUserById);
-router.get("/getallusers", UserController.getAllUsers);
+router.post("/:userId/current_location", UserController.updateCurrentLocation);
+router.post("/login", UserController.loginUser);
+router.post("/:userId/assign_store", UserController.assignNearestStore);
+router.post("/:userId/address", UserController.addAddress);
 
+router.get("/all", UserController.getAllUsers);
+router.get("/:userId", UserController.getUserById);
+
+router.put("/update/:userId", UserController.updateUserById);
+
+router.delete("/delete/:userId", UserController.deleteUserById);
 module.exports = router;
