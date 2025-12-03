@@ -1,4 +1,5 @@
 const Category = require("./Category_Schema.js");
+const fs = require("fs");
 
 exports.createCategory = async (data) => {
   let { category_name, category_img, type } = data;
@@ -47,17 +48,32 @@ exports.getCategoryById = async (id) => {
 };
 
 exports.updateCategory = async (id, data) => {
+  const category = await Category.findById(id);
+  if (!category) throw new Error("Category not found");
+
+  if (data.category_img && category.category_img) {
+    const localPath = category.category_img.replace(/^.+\/uploads/, "uploads");
+    if (fs.existsSync(localPath)) {
+      fs.unlinkSync(localPath);
+    }
+  }
+
   const updated = await Category.findByIdAndUpdate(id, data, {
     new: true,
     runValidators: true,
   });
 
-  if (!updated) throw new Error("Category not found");
   return updated;
 };
 
 exports.deleteCategory = async (id) => {
   const deleted = await Category.findByIdAndDelete(id);
   if (!deleted) throw new Error("Category not found");
+
+  if (deleted.category_img) {
+    const localPath = deleted.category_img.replace(/^.+\/uploads/, "uploads");
+    if (fs.existsSync(localPath)) fs.unlinkSync(localPath);
+  }
+
   return deleted;
 };

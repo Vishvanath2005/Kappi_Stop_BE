@@ -1,5 +1,6 @@
 const User = require("./User_Schema");
 const StoreService = require("../store/Store_Service");
+const fs = require("fs");
 
 exports.createUser = async (userdata) => {
   const { phone } = userdata;
@@ -71,25 +72,7 @@ exports.updateCurrentLocation = async (userId, latitude, longitude) => {
 
   return user;
 };
-//   const user = await User.findOne({ userId });
-//   if (!user) throw new Error("User not found");
 
-//   const { latitude, longitude } = user.current_location || {};
-//   if (!latitude || !longitude) throw new Error("User current location not set");
-
-//   const nearestStores = await StoreService.getStoresNearLocation(
-//     latitude,
-//     longitude,
-//     10000,
-//     1
-//   );
-
-//   if (!nearestStores.length) throw new Error("No nearby stores");
-
-//   user.store = nearestStores[0].storeId;
-//   await user.save();
-//   return user;
-// };
 
 exports.addAddress = async (userId, addressData) => {
   const user = await User.findOne({ userId });
@@ -116,12 +99,35 @@ exports.getUserById = async (userId) => {
 };
 
 exports.updateUserById = async (userId, updateData) => {
-  const updated = await User.findOneAndUpdate({ userId }, updateData, {
-    new: true,
-    runValidators: true,
-  });
-  if (!updated) throw new Error("User not found");
-  return updated;
+  const user = await User.findOne({ userId });
+  if (!user) throw new Error("User not found");
+
+  // delete old image if new one uploaded
+  if (updateData.user_img && user.user_img) {
+    const localPath = user.user_img.replace(/^.+\/uploads/, "uploads");
+    if (fs.existsSync(localPath)) fs.unlinkSync(localPath);
+  }
+
+  const updatedUser = await User.findOneAndUpdate(
+    { userId },
+    updateData,
+    { new: true, runValidators: true }
+  );
+
+  return updatedUser;
+};
+
+exports.updateUserStore = async (userId, storeId) => {
+  const user = await User.findOne({ userId });
+  if (!user) throw new Error("User not found");
+
+  // If user has multiple stores — you can validate here
+  // Example: if (!user.available_stores.includes(storeId)) throw new Error("Store not valid for this user")
+
+  user.store = storeId; // save selected store
+  await user.save();
+
+  return user;
 };
 
 exports.deleteUserById = async (userId) => {

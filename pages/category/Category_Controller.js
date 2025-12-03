@@ -4,29 +4,26 @@ exports.createCategory = async (req, res) => {
   try {
     const data = req.body;
 
-    // Parse JSON array sent from FormData
     if (data.type) {
       data.type = JSON.parse(data.type);
     }
 
-    // Save uploaded image
     if (req.file) {
-      data.category_img = `${req.protocol}://${req.get(
-        "host"
-      )}/uploads/category/${req.file.filename}`;
+      data.category_img = `${req.protocol}://${req.get("host")}/uploads/category/${req.file.filename}`;
     }
 
     const newCategory = await categoryService.createCategory(data);
-
     res.status(201).json({
       success: true,
       message: "Category created successfully",
       data: newCategory,
     });
+
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
   }
 };
+
 
 exports.getAllCategory = async (req, res) => {
   try {
@@ -50,16 +47,12 @@ exports.updateCategory = async (req, res) => {
   try {
     const data = req.body;
 
-    // Parse JSON
     if (data.type) {
       data.type = JSON.parse(data.type);
     }
 
-    // If image updated
     if (req.file) {
-      data.category_img = `${req.protocol}://${req.get(
-        "host"
-      )}/uploads/category/${req.file.filename}`;
+      data.category_img = `${req.protocol}://${req.get("host")}/uploads/category/${req.file.filename}`;
     }
 
     const updated = await categoryService.updateCategory(req.params.id, data);
@@ -69,10 +62,12 @@ exports.updateCategory = async (req, res) => {
       message: "Category updated successfully",
       data: updated,
     });
+
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
   }
 };
+
 
 exports.deleteCategory = async (req, res) => {
   try {

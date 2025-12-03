@@ -16,6 +16,7 @@ DBconnection();
 
 app.use(cors())
 app.use(express.json())
+app.use("/uploads", express.static("uploads"));
 app.use('/auth',Login_Route)
 app.use('/user',User_Route)
 app.use('/store',Store_Route)

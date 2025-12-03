@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const UserController = require("./User_Controller");
+const upload = require("../../middleware/upload")("user");
 
 router.post("/createuser", UserController.createUser);
 router.post("/:userId/current_location", UserController.updateCurrentLocation);
@@ -10,7 +11,12 @@ router.post("/:userId/address", UserController.addAddress);
 router.get("/all", UserController.getAllUsers);
 router.get("/:userId", UserController.getUserById);
 
-router.put("/update/:userId", UserController.updateUserById);
+router.put(
+  "/update/:userId",
+  upload.single("user_img"),  
+  UserController.updateUserById
+);
+router.put("/:userId/select_store", UserController.selectUserStore);
 
 router.delete("/delete/:userId", UserController.deleteUserById);
 module.exports = router;

@@ -143,11 +143,20 @@ exports.getUserById = async (req, res) => {
 exports.updateUserById = async (req, res) => {
   try {
     const { userId } = req.params;
-    const updatedUser = await UserService.updateUserById(userId, req.body);
+    const updateData = req.body;
+
+    // if new image uploaded
+    if (req.file) {
+      updateData.user_img = `${req.protocol}://${req.get("host")}/uploads/user/${req.file.filename}`;
+    }
+
+    const updatedUser = await UserService.updateUserById(userId, updateData);
+
     res.status(200).json({
       message: "User updated successfully",
       data: updatedUser,
     });
+
   } catch (error) {
     res.status(500).json({
       message: "Error updating user",
@@ -155,6 +164,31 @@ exports.updateUserById = async (req, res) => {
     });
   }
 };
+
+exports.selectUserStore = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { storeId } = req.body;
+
+    if (!storeId) {
+      return res.status(400).json({ message: "storeId is required" });
+    }
+
+    const updatedUser = await UserService.updateUserStore(userId, storeId);
+
+    res.status(200).json({
+      message: "User store updated successfully",
+      data: updatedUser,
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      message: "Error updating user store",
+      error: error.message,
+    });
+  }
+};
+
 
 exports.deleteUserById = async (req, res) => {
   try {

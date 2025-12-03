@@ -1,5 +1,6 @@
 const Menu = require("./Menu_Schema");
 const Category = require("../category/Category_Schema");
+const fs = require("fs");
 
 exports.createMenu = async (menuData) => {
   const {
@@ -36,6 +37,30 @@ exports.createMenu = async (menuData) => {
 
   return await newMenu.save();
 };
+
+exports.updateMenuById = async (productId, data) => {
+  const menu = await Menu.findOne({ productId });
+
+  if (!menu) throw new Error("Menu item not found");
+
+  // If new image uploaded delete old one
+  if (data.product_img && menu.product_img) {
+    const localPath = menu.product_img.replace(/^.+\/uploads/, "uploads");
+    if (fs.existsSync(localPath)) {
+      fs.unlinkSync(localPath);
+    }
+  }
+
+  // Update menu item
+  const updatedMenu = await Menu.findOneAndUpdate(
+    { productId },
+    data,
+    { new: true, runValidators: true }
+  );
+
+  return updatedMenu;
+};
+
 
 exports.getAllMenu = async () => {
   return await Menu.find().select(
@@ -74,21 +99,6 @@ exports.getMenuById = async (productId) => {
     throw new Error("Menu item not found");
   }
   return menu;
-};
-
-exports.updateMenuById = async (productId, menuData) => {
-  menuData.last_updated = new Date();
-
-  const updatedMenu = await Menu.findOneAndUpdate({ productId }, menuData, {
-    new: true,
-    runValidators: true,
-  });
-
-  if (!updatedMenu) {
-    throw new Error("Menu item not found");
-  }
-
-  return updatedMenu;
 };
 
 exports.deleteMenuById = async (productId) => {
