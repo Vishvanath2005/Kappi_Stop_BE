@@ -4,20 +4,16 @@ const fs = require("fs");
 exports.createCategory = async (data) => {
   let { category_name, category_img, type } = data;
 
-  // Normalize type to always be an array
   if (!type) {
     type = [];
   }
 
-  // If type is a string (from frontend), convert to array
   if (typeof type === "string") {
     type = type.split(",").map(item => item.trim());
   }
 
-  // 🔥 Remove empty strings
   type = type.filter(item => item !== "");
 
-  // If only empty values existed → type becomes []
   if (type.length === 0) {
     type = [];
   }
@@ -51,10 +47,16 @@ exports.updateCategory = async (id, data) => {
   const category = await Category.findById(id);
   if (!category) throw new Error("Category not found");
 
-  if (data.category_img && category.category_img) {
-    const localPath = category.category_img.replace(/^.+\/uploads/, "uploads");
-    if (fs.existsSync(localPath)) {
-      fs.unlinkSync(localPath);
+  // If a new image was uploaded
+  if (data.category_img) {
+    const oldImage = category.category_img;
+
+    if (oldImage) {
+      const oldImagePath = `uploads/category/${oldImage}`;
+
+      if (fs.existsSync(oldImagePath)) {
+        fs.unlinkSync(oldImagePath);  
+      }
     }
   }
 
@@ -65,6 +67,7 @@ exports.updateCategory = async (id, data) => {
 
   return updated;
 };
+
 
 exports.deleteCategory = async (id) => {
   const deleted = await Category.findByIdAndDelete(id);

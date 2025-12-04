@@ -4,6 +4,10 @@ exports.createMenu = async (req, res) => {
   try {
     const menuData = req.body;
 
+    if (menuData.add_ons && typeof menuData.add_ons === "string") {
+      menuData.add_ons = JSON.parse(menuData.add_ons);
+    }
+
     if (req.file) {
       menuData.product_img = `${req.file.filename}`;
     }
@@ -15,7 +19,6 @@ exports.createMenu = async (req, res) => {
       message: "Menu item created successfully",
       data: newMenu,
     });
-
   } catch (error) {
     res.status(400).json({
       success: false,
@@ -29,7 +32,17 @@ exports.updateMenuById = async (req, res) => {
     const { productId } = req.params;
     const data = req.body;
 
-    // If a new image is uploaded
+    if (data.add_ons && typeof data.add_ons === "string") {
+      try {
+        data.add_ons = JSON.parse(data.add_ons);
+      } catch (err) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid add_ons JSON format",
+        });
+      }
+    }
+
     if (req.file) {
       data.product_img = `${req.file.filename}`;
     }
@@ -41,7 +54,6 @@ exports.updateMenuById = async (req, res) => {
       message: "Menu updated successfully",
       data: updatedMenu,
     });
-
   } catch (error) {
     res.status(400).json({
       success: false,
@@ -49,8 +61,6 @@ exports.updateMenuById = async (req, res) => {
     });
   }
 };
-
-
 
 exports.getAllMenu = async (req, res) => {
   try {
@@ -121,8 +131,6 @@ exports.getMenuById = async (req, res) => {
     });
   }
 };
-
-
 
 exports.deleteMenuById = async (req, res) => {
   try {

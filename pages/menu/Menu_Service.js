@@ -7,6 +7,7 @@ exports.createMenu = async (menuData) => {
     product_name,
     product_img,
     category,
+    description,
     price,
     add_ons,
     available_store,
@@ -27,59 +28,71 @@ exports.createMenu = async (menuData) => {
     product_name,
     product_img,
     available_store,
+    description,
     type: type || "none",
-    category: category || "Uncategorized",
+    category: category,
     price: price || 0,
     add_ons: add_ons || [],
     last_updated: new Date(),
-    status: status || "available",
+    status: status || "Available",
   });
 
   return await newMenu.save();
 };
 
-exports.updateMenuById = async (productId, data) => {
-  const menu = await Menu.findOne({ productId });
+exports.updateUserById = async (userId, updateData) => {
+  const user = await User.findOne({ userId });
+  if (!user) throw new Error("User not found");
 
-  if (!menu) throw new Error("Menu item not found");
+  // If a new image is uploaded
+  if (updateData.user_img) {
+    const oldImage = user.user_img;
 
-  // If new image uploaded delete old one
-  if (data.product_img && menu.product_img) {
-    const localPath = menu.product_img.replace(/^.+\/uploads/, "uploads");
-    if (fs.existsSync(localPath)) {
-      fs.unlinkSync(localPath);
+    if (oldImage) {
+      const oldImagePath = `uploads/users/${oldImage}`;
+      const newImagePath = `uploads/users/${updateData.user_img}`;
+
+      // Remove the old image if it exists
+      if (fs.existsSync(oldImagePath)) {
+        fs.unlinkSync(oldImagePath);
+      }
+
+      if (fs.existsSync(newImagePath)) {
+        fs.renameSync(newImagePath, oldImagePath);
+      }
+
+      updateData.user_img = oldImage;
     }
   }
 
-  // Update menu item
-  const updatedMenu = await Menu.findOneAndUpdate(
-    { productId },
-    data,
-    { new: true, runValidators: true }
-  );
+  // Update the user
+  const updatedUser = await User.findOneAndUpdate({ userId }, updateData, {
+    new: true,
+    runValidators: true,
+  });
 
-  return updatedMenu;
+  return updatedUser;
 };
-
 
 exports.getAllMenu = async () => {
   return await Menu.find().select(
-    "productId product_name product_img category price add_ons available_store type last_updated status"
+    "productId product_name description product_img category price add_ons available_store type last_updated status"
   );
 };
 
 exports.getCategoriesByStore = async (storeId) => {
-  const menuList = await Menu.find({ available_store: storeId }).select("category");
+  const menuList = await Menu.find({ available_store: storeId }).select(
+    "category"
+  );
 
-  const categoryNames = [...new Set(menuList.map(item => item.category))];
+  const categoryNames = [...new Set(menuList.map((item) => item.category))];
 
   const categories = await Category.find({
-    category_name: { $in: categoryNames }
+    category_name: { $in: categoryNames },
   }).select("category_name category_img ");
 
   return categories;
 };
-
 
 exports.getMenuByFilters = async (storeId, category, type) => {
   const query = {};
@@ -89,7 +102,7 @@ exports.getMenuByFilters = async (storeId, category, type) => {
   if (type) query.type = type;
 
   return await Menu.find(query).select(
-    "productId product_name product_img category price add_ons type last_updated status"
+    "productId product_name  description product_img category price add_ons type last_updated status"
   );
 };
 
