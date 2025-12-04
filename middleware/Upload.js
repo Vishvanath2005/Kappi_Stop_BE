@@ -5,7 +5,6 @@ const fs = require("fs");
 module.exports = (folderName) => {
   const uploadPath = path.join("uploads", folderName);
 
-  // Create folder if missing
   if (!fs.existsSync(uploadPath)) {
     fs.mkdirSync(uploadPath, { recursive: true });
   }

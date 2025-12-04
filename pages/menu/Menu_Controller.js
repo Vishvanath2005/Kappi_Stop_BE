@@ -4,9 +4,8 @@ exports.createMenu = async (req, res) => {
   try {
     const menuData = req.body;
 
-    // Attach uploaded image
     if (req.file) {
-      menuData.product_img = `${req.protocol}://${req.get("host")}/uploads/menu/${req.file.filename}`;
+      menuData.product_img = `${req.file.filename}`;
     }
 
     const newMenu = await menuService.createMenu(menuData);
@@ -32,7 +31,7 @@ exports.updateMenuById = async (req, res) => {
 
     // If a new image is uploaded
     if (req.file) {
-      data.product_img = `${req.protocol}://${req.get("host")}/uploads/menu/${req.file.filename}`;
+      data.product_img = `${req.file.filename}`;
     }
 
     const updatedMenu = await menuService.updateMenuById(productId, data);

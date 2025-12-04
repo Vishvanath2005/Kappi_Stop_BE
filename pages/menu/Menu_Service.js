@@ -64,7 +64,7 @@ exports.updateMenuById = async (productId, data) => {
 
 exports.getAllMenu = async () => {
   return await Menu.find().select(
-    "productId product_name category price add_ons available_store type last_updated status"
+    "productId product_name product_img category price add_ons available_store type last_updated status"
   );
 };
 
@@ -89,7 +89,7 @@ exports.getMenuByFilters = async (storeId, category, type) => {
   if (type) query.type = type;
 
   return await Menu.find(query).select(
-    "productId product_name category price add_ons type last_updated status"
+    "productId product_name product_img category price add_ons type last_updated status"
   );
 };
 

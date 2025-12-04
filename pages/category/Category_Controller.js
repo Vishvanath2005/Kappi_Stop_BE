@@ -9,7 +9,7 @@ exports.createCategory = async (req, res) => {
     }
 
     if (req.file) {
-      data.category_img = `${req.protocol}://${req.get("host")}/uploads/category/${req.file.filename}`;
+      data.category_img = `${req.file.filename}`;
     }
 
     const newCategory = await categoryService.createCategory(data);
@@ -52,7 +52,7 @@ exports.updateCategory = async (req, res) => {
     }
 
     if (req.file) {
-      data.category_img = `${req.protocol}://${req.get("host")}/uploads/category/${req.file.filename}`;
+      data.category_img = `${req.file.filename}`;
     }
 
     const updated = await categoryService.updateCategory(req.params.id, data);

@@ -145,9 +145,8 @@ exports.updateUserById = async (req, res) => {
     const { userId } = req.params;
     const updateData = req.body;
 
-    // if new image uploaded
     if (req.file) {
-      updateData.user_img = `${req.protocol}://${req.get("host")}/uploads/user/${req.file.filename}`;
+      updateData.user_img = `${req.file.filename}`;
     }
 
     const updatedUser = await UserService.updateUserById(userId, updateData);
