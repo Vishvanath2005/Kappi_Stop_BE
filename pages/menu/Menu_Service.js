@@ -40,39 +40,34 @@ exports.createMenu = async (menuData) => {
   return await newMenu.save();
 };
 
-exports.updateUserById = async (userId, updateData) => {
-  const user = await User.findOne({ userId });
-  if (!user) throw new Error("User not found");
+exports.updateMenuById = async (productId, data) => {
+  const menu = await Menu.findOne({ productId });
+  if (!menu) throw new Error("Menu item not found");
 
-  // If a new image is uploaded
-  if (updateData.user_img) {
-    const oldImage = user.user_img;
+  if (data.product_img) {
+    const oldImage = menu.product_img;
 
     if (oldImage) {
-      const oldImagePath = `uploads/users/${oldImage}`;
-      const newImagePath = `uploads/users/${updateData.user_img}`;
+      const oldImagePath = `uploads/menu/${oldImage}`;
 
-      // Remove the old image if it exists
       if (fs.existsSync(oldImagePath)) {
         fs.unlinkSync(oldImagePath);
       }
-
-      if (fs.existsSync(newImagePath)) {
-        fs.renameSync(newImagePath, oldImagePath);
-      }
-
-      updateData.user_img = oldImage;
     }
   }
 
-  // Update the user
-  const updatedUser = await User.findOneAndUpdate({ userId }, updateData, {
-    new: true,
-    runValidators: true,
-  });
+  const updatedMenu = await Menu.findOneAndUpdate(
+    { productId },
+    data,
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
 
-  return updatedUser;
+  return updatedMenu;
 };
+
 
 exports.getAllMenu = async () => {
   return await Menu.find().select(

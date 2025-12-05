@@ -102,20 +102,30 @@ exports.updateUserById = async (userId, updateData) => {
   const user = await User.findOne({ userId });
   if (!user) throw new Error("User not found");
 
-  // delete old image if new one uploaded
-  if (updateData.user_img && user.user_img) {
-    const localPath = user.user_img.replace(/^.+\/uploads/, "uploads");
-    if (fs.existsSync(localPath)) fs.unlinkSync(localPath);
+  if (updateData.user_img) {
+    const oldImage = user.user_img;
+
+    if (oldImage) {
+      const oldImagePath = `uploads/users/${oldImage}`;
+
+      if (fs.existsSync(oldImagePath)) {
+        fs.unlinkSync(oldImagePath);
+      }
+    }
   }
 
   const updatedUser = await User.findOneAndUpdate(
     { userId },
     updateData,
-    { new: true, runValidators: true }
+    {
+      new: true,
+      runValidators: true,
+    }
   );
 
   return updatedUser;
 };
+
 
 exports.updateUserStore = async (userId, storeId) => {
   const user = await User.findOne({ userId });

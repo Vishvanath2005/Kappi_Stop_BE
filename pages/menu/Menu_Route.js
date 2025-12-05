@@ -28,7 +28,6 @@ router.put(
   MenuController.updateMenuById
 );
 
-
 router.delete("/deletemenu/:productId", MenuController.deleteMenuById);
 
 module.exports = router;
