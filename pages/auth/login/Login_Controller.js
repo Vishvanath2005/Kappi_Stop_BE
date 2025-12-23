@@ -14,7 +14,7 @@ exports.simpleLogin = async (req, res) => {
     const result = await LoginService.simpleLogin({ email, phone, password });
 
     if (!result.success) {
-      return res.status(401).json(result); // user not found or wrong password
+      return res.status(401).json(result); 
     }
 
     res.status(200).json({

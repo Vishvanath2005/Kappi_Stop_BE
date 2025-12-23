@@ -1,6 +1,7 @@
 const User = require("./User_Schema");
 const StoreService = require("../store/Store_Service");
 const fs = require("fs");
+const path = require("path"); 
 
 exports.createUser = async (userdata) => {
   const { phone } = userdata;
@@ -76,16 +77,32 @@ exports.updateCurrentLocation = async (userId, latitude, longitude) => {
 
 exports.addAddress = async (userId, addressData) => {
   const user = await User.findOne({ userId });
-  if (!user) throw new Error("User not found");
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  // If new address is marked as default, unset previous defaults
+  if (addressData.is_default === true) {
+    user.address.forEach(addr => {
+      addr.is_default = false;
+    });
+  }
 
   user.address.push({
-    name: addressData.name,
-    location: addressData.location,
+    location_name: addressData.location_name || null,
+    contact_number: addressData.contact_number || null,
+    address_line1: addressData.address_line1 || null,
+    address_line2: addressData.address_line2 || null,
+    city: addressData.city || null,
+    state: addressData.state || null,
+    pin_code: addressData.pin_code || null,
+    is_default: addressData.is_default || false,
   });
 
   await user.save();
   return user;
 };
+
 
 
 exports.getAllUsers = async () => {
@@ -102,15 +119,16 @@ exports.updateUserById = async (userId, updateData) => {
   const user = await User.findOne({ userId });
   if (!user) throw new Error("User not found");
 
-  if (updateData.user_img) {
-    const oldImage = user.user_img;
+  if (updateData.user_img && user.user_img) {
+    const oldImagePath = path.join(
+      process.cwd(),
+      "uploads",
+      "user",     
+      user.user_img
+    );
 
-    if (oldImage) {
-      const oldImagePath = `uploads/users/${oldImage}`;
-
-      if (fs.existsSync(oldImagePath)) {
-        fs.unlinkSync(oldImagePath);
-      }
+    if (fs.existsSync(oldImagePath)) {
+      fs.unlinkSync(oldImagePath);
     }
   }
 

@@ -13,7 +13,7 @@ router.get("/:userId", UserController.getUserById);
 
 router.put(
   "/update/:userId",
-  upload.single("user_img"),  
+  upload.single("user_img"),
   UserController.updateUserById
 );
 router.put("/:userId/select_store", UserController.selectUserStore);

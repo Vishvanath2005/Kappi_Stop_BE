@@ -143,10 +143,12 @@ exports.getUserById = async (req, res) => {
 exports.updateUserById = async (req, res) => {
   try {
     const { userId } = req.params;
-    const updateData = req.body;
+    const updateData = { ...req.body };
 
     if (req.file) {
-      updateData.user_img = `${req.file.filename}`;
+      updateData.user_img = req.file.filename;
+    } else {
+      delete updateData.user_img; // 🔒 protect existing image
     }
 
     const updatedUser = await UserService.updateUserById(userId, updateData);

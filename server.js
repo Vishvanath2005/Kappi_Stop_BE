@@ -28,7 +28,7 @@ app.use('/offer',Offer_Route)
 app.use('/attraction',Attraction_Route)
 
 require("dotenv").config();
-const Port = process.env.Port;
+const Port = process.env.PORT;
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
