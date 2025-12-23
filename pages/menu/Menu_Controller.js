@@ -4,10 +4,6 @@ exports.createMenu = async (req, res) => {
   try {
     const menuData = req.body;
 
-    if (menuData.add_ons && typeof menuData.add_ons === "string") {
-      menuData.add_ons = JSON.parse(menuData.add_ons);
-    }
-
     if (req.file) {
       menuData.product_img = `${req.file.filename}`;
     }

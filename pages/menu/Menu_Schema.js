@@ -1,13 +1,5 @@
 const mongoose = require("mongoose");
 
-const addOnSchema = new mongoose.Schema(
-  {
-    add_name: { type: String },
-    value: { type: Number },
-  },
-  { _id: false }
-);
-
 const menuSchema = new mongoose.Schema(
   {
     productId: { type: String },
@@ -17,9 +9,6 @@ const menuSchema = new mongoose.Schema(
     category: { type: String },
     type: { type: String },
     price: { type: Number },
-
-    add_ons: { type: [addOnSchema] },
-
     available_store: { type: [String] },
     last_updated: { type: Date, default: Date.now },
     status: { type: String },
@@ -28,5 +17,4 @@ const menuSchema = new mongoose.Schema(
 );
 
 const Menu = mongoose.model("Menu", menuSchema);
-
 module.exports = Menu;

@@ -9,7 +9,6 @@ exports.createMenu = async (menuData) => {
     category,
     description,
     price,
-    add_ons,
     available_store,
     type,
     status,
@@ -30,9 +29,8 @@ exports.createMenu = async (menuData) => {
     available_store,
     description,
     type: type || "none",
-    category: category,
+    category,
     price: price || 0,
-    add_ons: add_ons || [],
     last_updated: new Date(),
     status: status || "Available",
   });
@@ -44,36 +42,26 @@ exports.updateMenuById = async (productId, data) => {
   const menu = await Menu.findOne({ productId });
   if (!menu) throw new Error("Menu item not found");
 
-  if (data.product_img) {
-    const oldImage = menu.product_img;
-
-    if (oldImage) {
-      const oldImagePath = `uploads/menu/${oldImage}`;
-
-      if (fs.existsSync(oldImagePath)) {
-        fs.unlinkSync(oldImagePath);
-      }
+  if (data.product_img && menu.product_img) {
+    const oldImagePath = `uploads/menu/${menu.product_img}`;
+    if (fs.existsSync(oldImagePath)) {
+      fs.unlinkSync(oldImagePath);
     }
   }
 
-  const updatedMenu = await Menu.findOneAndUpdate(
+  return await Menu.findOneAndUpdate(
     { productId },
     data,
-    {
-      new: true,
-      runValidators: true,
-    }
+    { new: true, runValidators: true }
   );
-
-  return updatedMenu;
 };
-
 
 exports.getAllMenu = async () => {
   return await Menu.find().select(
-    "productId product_name description product_img category price add_ons available_store type last_updated status"
+    "productId product_name description product_img category price available_store type last_updated status"
   );
 };
+
 
 exports.getCategoriesByStore = async (storeId) => {
   const menuList = await Menu.find({ available_store: storeId }).select(
@@ -91,13 +79,12 @@ exports.getCategoriesByStore = async (storeId) => {
 
 exports.getMenuByFilters = async (storeId, category, type) => {
   const query = {};
-
   if (storeId) query.available_store = storeId;
   if (category) query.category = category;
   if (type) query.type = type;
 
   return await Menu.find(query).select(
-    "productId product_name  description product_img category price add_ons type last_updated status"
+    "productId product_name description product_img category price type last_updated status"
   );
 };
 
