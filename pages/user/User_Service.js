@@ -122,8 +122,7 @@ exports.updateUserById = async (userId, updateData) => {
   if (updateData.user_img && user.user_img) {
     const oldImagePath = path.join(
       process.cwd(),
-      "uploads",
-      "user",     
+      "uploads", 
       user.user_img
     );
 

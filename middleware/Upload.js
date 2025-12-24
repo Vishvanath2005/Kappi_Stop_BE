@@ -2,8 +2,10 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-module.exports = (folderName) => {
-  const uploadPath = path.join("uploads", folderName);
+module.exports = (folderName = "") => {
+  const uploadPath = folderName
+    ? path.join("uploads", folderName)
+    : path.join("uploads"); // ✅ root uploads
 
   if (!fs.existsSync(uploadPath)) {
     fs.mkdirSync(uploadPath, { recursive: true });
