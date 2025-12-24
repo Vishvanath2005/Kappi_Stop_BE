@@ -74,15 +74,19 @@ exports.updateCurrentLocation = async (userId, latitude, longitude) => {
   return user;
 };
 
-
 exports.addAddress = async (userId, addressData) => {
   const user = await User.findOne({ userId });
-  if (!user) {
-    throw new Error("User not found");
+  if (!user) throw new Error("User not found");
+
+  let makeDefault = addressData.is_default === true;
+
+  // If no address exists yet → auto default
+  if (user.address.length === 0) {
+    makeDefault = true;
   }
 
-  // If new address is marked as default, unset previous defaults
-  if (addressData.is_default === true) {
+  // If new address is default → unset all others
+  if (makeDefault) {
     user.address.forEach(addr => {
       addr.is_default = false;
     });
@@ -96,14 +100,12 @@ exports.addAddress = async (userId, addressData) => {
     city: addressData.city || null,
     state: addressData.state || null,
     pin_code: addressData.pin_code || null,
-    is_default: addressData.is_default || false,
+    is_default: makeDefault,
   });
 
   await user.save();
   return user;
 };
-
-
 
 exports.getAllUsers = async () => {
   return await User.find();
@@ -156,6 +158,60 @@ exports.updateUserStore = async (userId, storeId) => {
 
   return user;
 };
+
+exports.updateAddress = async (userId, addressId, addressData) => {
+  const user = await User.findOne({ userId });
+  if (!user) throw new Error("User not found");
+
+  // If setting this address as default → unset others
+  if (addressData.is_default === true) {
+    user.address.forEach(addr => {
+      addr.is_default = false;
+    });
+    await user.save();
+  }
+
+  const updatedUser = await User.findOneAndUpdate(
+    {
+      userId,
+      "address._id": addressId,
+    },
+    {
+      $set: {
+        "address.$.location_name": addressData.location_name,
+        "address.$.contact_number": addressData.contact_number,
+        "address.$.address_line1": addressData.address_line1,
+        "address.$.address_line2": addressData.address_line2,
+        "address.$.city": addressData.city,
+        "address.$.state": addressData.state,
+        "address.$.pin_code": addressData.pin_code,
+        "address.$.is_default": addressData.is_default,
+      },
+    },
+    { new: true }
+  );
+
+  if (!updatedUser) throw new Error("Address not found");
+
+  return updatedUser;
+};
+
+exports.deleteAddress = async (userId, addressId) => {
+  const updatedUser = await User.findOneAndUpdate(
+    { userId },
+    {
+      $pull: {
+        address: { _id: addressId },
+      },
+    },
+    { new: true }
+  );
+
+  if (!updatedUser) throw new Error("User or address not found");
+
+  return updatedUser;
+};
+
 
 exports.deleteUserById = async (userId) => {
   const deleted = await User.findOneAndDelete({ userId });

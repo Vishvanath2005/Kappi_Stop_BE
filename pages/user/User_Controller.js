@@ -190,6 +190,49 @@ exports.selectUserStore = async (req, res) => {
   }
 };
 
+exports.updateAddress = async (req, res) => {
+  try {
+    const { userId, addressId } = req.params;
+
+    const updatedUser = await UserService.updateAddress(
+      userId,
+      addressId,
+      req.body
+    );
+
+    res.status(200).json({
+      message: "Address updated successfully",
+      data: updatedUser,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error updating address",
+      error: error.message,
+    });
+  }
+};
+
+exports.deleteAddress = async (req, res) => {
+  try {
+    const { userId, addressId } = req.params;
+
+    const updatedUser = await UserService.deleteAddress(
+      userId,
+      addressId
+    );
+
+    res.status(200).json({
+      message: "Address deleted successfully",
+      data: updatedUser,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error deleting address",
+      error: error.message,
+    });
+  }
+};
+
 
 exports.deleteUserById = async (req, res) => {
   try {

@@ -18,5 +18,9 @@ router.put(
 );
 router.put("/:userId/select_store", UserController.selectUserStore);
 
+router.put("/:userId/address/:addressId", UserController.updateAddress);
+
+router.delete("/:userId/address/:addressId", UserController.deleteAddress);
+
 router.delete("/delete/:userId", UserController.deleteUserById);
 module.exports = router;
