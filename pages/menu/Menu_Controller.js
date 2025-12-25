@@ -88,7 +88,10 @@ exports.getMenuByFilters = async (req, res) => {
       data: menuList,
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 

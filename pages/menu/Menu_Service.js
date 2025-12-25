@@ -79,14 +79,24 @@ exports.getCategoriesByStore = async (storeId) => {
 
 exports.getMenuByFilters = async (storeId, category, type) => {
   const query = {};
-  if (storeId) query.available_store = storeId;
-  if (category) query.category = category;
-  if (type) query.type = type;
+
+  if (storeId) {
+    query.available_store = { $regex: storeId }; 
+  }
+
+  if (category) {
+    query.category = category;
+  }
+
+  if (type) {
+    query.type = type;
+  }
 
   return await Menu.find(query).select(
-    "productId product_name description product_img category price type last_updated status"
+    "productId product_name description product_img category price type last_updated status available_store"
   );
 };
+
 
 exports.getMenuById = async (productId) => {
   const menu = await Menu.findOne({ productId });
