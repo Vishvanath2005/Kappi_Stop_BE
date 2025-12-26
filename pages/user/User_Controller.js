@@ -9,7 +9,7 @@ exports.createUser = async (req, res) => {
     }
 
     const user = await UserService.createUser({
-      phone
+      phone,
     });
 
     res.status(201).json({
@@ -128,10 +128,21 @@ exports.getUserById = async (req, res) => {
   try {
     const { userId } = req.params;
     const user = await UserService.getUserById(userId);
+
+    const baseUrl = `${req.protocol}://${req.get("host")}`;
+    const userObj = user.toObject();
+
+    if (userObj.user_img) {
+      userObj.user_img = `${baseUrl}/uploads/${userObj.user_img}`;
+    } else {
+      userObj.user_img = null;
+    }
+
     res.status(200).json({
       message: "User retrieved successfully",
-      data: user,
+      data: userObj,
     });
+    console.log(userObj);
   } catch (error) {
     res.status(404).json({
       message: "User not found",
@@ -143,21 +154,32 @@ exports.getUserById = async (req, res) => {
 exports.updateUserById = async (req, res) => {
   try {
     const { userId } = req.params;
+
+    // Clone body safely
     const updateData = { ...req.body };
 
+    // If image uploaded
     if (req.file) {
-      updateData.user_img = req.file.filename;
+      updateData.user_img = `${req.file.filename}`;
     } else {
-      delete updateData.user_img; // 🔒 protect existing image
+      // 🚫 DO NOT overwrite image if not sent
+      delete updateData.user_img;
     }
 
     const updatedUser = await UserService.updateUserById(userId, updateData);
 
+    // ✅ Send full image URL
+    const baseUrl = `${req.protocol}://${req.get("host")}`;
+    const userObj = updatedUser.toObject();
+
+    if (userObj.user_img) {
+      userObj.user_img = `${baseUrl}/uploads/${userObj.user_img}`;
+    }
+
     res.status(200).json({
       message: "User updated successfully",
-      data: updatedUser,
+      data: userObj,
     });
-
   } catch (error) {
     res.status(500).json({
       message: "Error updating user",
@@ -181,7 +203,6 @@ exports.selectUserStore = async (req, res) => {
       message: "User store updated successfully",
       data: updatedUser,
     });
-
   } catch (error) {
     res.status(500).json({
       message: "Error updating user store",
@@ -216,10 +237,7 @@ exports.deleteAddress = async (req, res) => {
   try {
     const { userId, addressId } = req.params;
 
-    const updatedUser = await UserService.deleteAddress(
-      userId,
-      addressId
-    );
+    const updatedUser = await UserService.deleteAddress(userId, addressId);
 
     res.status(200).json({
       message: "Address deleted successfully",
@@ -232,7 +250,6 @@ exports.deleteAddress = async (req, res) => {
     });
   }
 };
-
 
 exports.deleteUserById = async (req, res) => {
   try {

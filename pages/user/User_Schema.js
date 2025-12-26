@@ -45,37 +45,37 @@ const UserSchema = new mongoose.Schema(
       {
         location_name: {
           type: String,
-          default:null,
+          default: null,
           trim: true,
         },
         contact_number: {
           type: String,
-          default:null,
+          default: null,
           trim: true,
         },
         address_line1: {
           type: String,
-          default:null,
+          default: null,
           trim: true,
         },
         address_line2: {
           type: String,
-          default:null,
+          default: null,
           trim: true,
         },
         city: {
           type: String,
-          default:null,
+          default: null,
           trim: true,
         },
         state: {
           type: String,
-          default:null,
+          default: null,
           trim: true,
         },
         pin_code: {
           type: String,
-          default:null,
+          default: null,
           trim: true,
         },
         is_default: {
