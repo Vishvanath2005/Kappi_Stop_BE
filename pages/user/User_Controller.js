@@ -142,7 +142,6 @@ exports.getUserById = async (req, res) => {
       message: "User retrieved successfully",
       data: userObj,
     });
-    console.log(userObj);
   } catch (error) {
     res.status(404).json({
       message: "User not found",
@@ -214,7 +213,6 @@ exports.selectUserStore = async (req, res) => {
 exports.updateAddress = async (req, res) => {
   try {
     const { userId, addressId } = req.params;
-
     const updatedUser = await UserService.updateAddress(
       userId,
       addressId,

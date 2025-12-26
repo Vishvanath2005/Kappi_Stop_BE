@@ -24,11 +24,10 @@ const storeSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-
-    serviceRadiusMeters: {
-      type: Number,
-      default: 5000,
-    },
+    // serviceRadiusMeters: {
+    //   type: Number,
+    //   default: 5000,
+    // },
   },
   { timestamps: true }
 );

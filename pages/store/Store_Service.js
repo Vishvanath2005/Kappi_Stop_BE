@@ -11,7 +11,7 @@ exports.createStore = async (storeData) => {
     status,
     latitude,
     longitude,
-    serviceRadiusMeters,
+    // serviceRadiusMeters,
   } = storeData;
 
   const existingStore = await Store.findOne({ store_number });
@@ -32,7 +32,7 @@ exports.createStore = async (storeData) => {
     status: status || "Active",
     latitude,
     longitude,
-    serviceRadiusMeters: serviceRadiusMeters || 5000,
+    // serviceRadiusMeters: serviceRadiusMeters || 5000,
   });
 
   return await newStore.save();
@@ -40,7 +40,7 @@ exports.createStore = async (storeData) => {
 
 exports.getAllStores = async () => {
   return await Store.find().select(
-    "storeId store_name city address store_number opening_hours status latitude longitude serviceRadiusMeters"
+    "storeId store_name city address store_number opening_hours status latitude longitude "
   );
 };
 
