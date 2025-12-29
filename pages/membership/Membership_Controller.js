@@ -1,20 +1,19 @@
 const membershipPlanService = require("./Membership_Service");
+const fs = require("fs");
+const path = require("path");
 
 exports.createPlan = async (req, res) => {
   try {
-    const data = { ...req.body }; // ✅ CLONE
+    const data = { ...req.body };
 
-    // Parse plan_benefits
     if (data.plan_benefits) {
       data.plan_benefits = JSON.parse(data.plan_benefits);
     }
 
-    // Sanitize price
     if (data.price) {
       data.price = Number(data.price.toString().replace(/,/g, ""));
     }
 
-    // Attach image
     if (req.file) {
       data.plan_img = `${req.file.filename}`;
     }
@@ -33,7 +32,6 @@ exports.createPlan = async (req, res) => {
     });
   }
 };
-
 
 exports.getAllPlans = async (req, res) => {
   try {
@@ -67,15 +65,45 @@ exports.getPlanById = async (req, res) => {
 
 exports.updatePlan = async (req, res) => {
   try {
-    const plan = await membershipPlanService.updatePlan(
+    const data = { ...req.body };
+
+    if (data.plan_benefits) {
+      data.plan_benefits = JSON.parse(data.plan_benefits);
+    }
+
+    if (data.price) {
+      data.price = Number(data.price.toString().replace(/,/g, ""));
+    }
+
+    const existingPlan = await membershipPlanService.getPlanById(req.params.id);
+
+    if (req.file) {
+      if (existingPlan.plan_img) {
+        const oldImagePath = path.join(
+          __dirname,
+          "../../uploads/membership",
+          existingPlan.plan_img
+        );
+
+        if (fs.existsSync(oldImagePath)) {
+          fs.unlinkSync(oldImagePath);
+        }
+      }
+
+      data.plan_img = req.file.filename;
+    }
+
+    const updatedPlan = await membershipPlanService.updatePlan(
       req.params.id,
-      req.body
+      data
     );
+
     res.status(200).json({
       success: true,
-      data: plan,
+      data: updatedPlan,
     });
   } catch (error) {
+    console.error(error);
     res.status(400).json({
       success: false,
       message: error.message,
