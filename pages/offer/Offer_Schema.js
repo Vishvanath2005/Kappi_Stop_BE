@@ -5,6 +5,10 @@ const offerSchema = new mongoose.Schema(
     offerId: {
       type: String,
     },
+      offer_img: {
+      type: String,
+      required:true
+    },
     title: {
       type: String,
       required: true,

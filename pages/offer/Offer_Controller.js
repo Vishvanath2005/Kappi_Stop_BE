@@ -1,9 +1,17 @@
-const offerService = require('./Offer_Service');
+const offerService = require("./Offer_Service");
+const fs = require("fs");
+const path = require("path");
 
 exports.createOffer = async (req, res) => {
   try {
-    const offerData = req.body;
-    const newOffer = await offerService.createOffer(offerData);
+    const data = { ...req.body };
+
+    if (req.file) {
+      data.offer_img = req.file.filename;
+    }
+
+    const newOffer = await offerService.createOffer(data);
+
     res.status(201).json({
       success: true,
       message: "Offer created successfully",
@@ -12,7 +20,7 @@ exports.createOffer = async (req, res) => {
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: error.message || "Failed to create offer",
+      message: error.message,
     });
   }
 };
@@ -52,8 +60,28 @@ exports.getOfferById = async (req, res) => {
 exports.updateOfferById = async (req, res) => {
   try {
     const { offerId } = req.params;
-    const offerData = req.body;
-    const updatedOffer = await offerService.updateOfferById(offerId, offerData);
+    const data = { ...req.body };
+
+    const existingOffer = await offerService.getOfferById(offerId);
+
+    // Replace image if new one uploaded
+    if (req.file) {
+      if (existingOffer.offer_img) {
+        const oldImgPath = path.join(
+          __dirname,
+          "../../uploads/offer",
+          existingOffer.offer_img
+        );
+
+        if (fs.existsSync(oldImgPath)) {
+          fs.unlinkSync(oldImgPath);
+        }
+      }
+
+      data.offer_img = req.file.filename;
+    }
+
+    const updatedOffer = await offerService.updateOfferById(offerId, data);
 
     res.status(200).json({
       success: true,
@@ -63,7 +91,7 @@ exports.updateOfferById = async (req, res) => {
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: error.message || "Failed to update offer",
+      message: error.message,
     });
   }
 };

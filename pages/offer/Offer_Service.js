@@ -8,15 +8,23 @@ exports.createOffer = async (offerData) => {
     valid_from,
     valid_to,
     applicable_store,
+    offer_img,
   } = offerData;
-
-  const count = await Offer.countDocuments();
-  const offerId = `OFF-${count + 1}`;
 
   const existingOffer = await Offer.findOne({ title });
   if (existingOffer) {
     throw new Error("Offer already exists with this title");
   }
+
+  const lastOffer = await Offer.findOne().sort({ createdAt: -1 });
+
+  let nextNumber = 1;
+  if (lastOffer && lastOffer.offerId) {
+    const lastNumber = parseInt(lastOffer.offerId.split("-")[1]);
+    nextNumber = lastNumber + 1;
+  }
+
+  const offerId = `OFF-${String(nextNumber).padStart(4, "0")}`;
 
   const newOffer = new Offer({
     offerId,
@@ -26,6 +34,7 @@ exports.createOffer = async (offerData) => {
     valid_from,
     valid_to,
     applicable_store: applicable_store || [],
+    offer_img,
   });
 
   return await newOffer.save();
