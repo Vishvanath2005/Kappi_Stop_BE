@@ -80,11 +80,6 @@ exports.addAddress = async (userId, addressData) => {
 
   let makeDefault = addressData.is_default === true;
 
-  // If no address exists yet → auto default
-  if (user.address.length === 0) {
-    makeDefault = true;
-  }
-
   // If new address is default → unset all others
   if (makeDefault) {
     user.address.forEach(addr => {
