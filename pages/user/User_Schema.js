@@ -80,7 +80,6 @@ const UserSchema = new mongoose.Schema(
         },
         is_default: {
           type: Boolean,
-          default: false,
         },
       },
     ],
