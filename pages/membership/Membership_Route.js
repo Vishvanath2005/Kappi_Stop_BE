@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const membershipPlanController = require("./Membership_Controller");
-const uploadMembership = require("../../middleware/upload")("membership");
+const uploadMembership = require("../../middleware/Upload.js")("membership");
 
 router.post(
   "/createmembership",
