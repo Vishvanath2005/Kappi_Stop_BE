@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const UserController = require("./User_Controller");
-const upload = require("../../middleware/upload")();
+const upload = require("../../middleware/Upload.js")();
 
 router.post("/createuser", UserController.createUser);
 router.post("/:userId/current_location", UserController.updateCurrentLocation);
