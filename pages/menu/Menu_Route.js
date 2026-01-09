@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const MenuController = require("./Menu_Controller");
-const upload = require("../../middleware/upload")("menu");
+const upload = require("../../middleware/Upload.js")("menu");
 
 router.post(
   "/createmenu",

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const OfferController = require("./Offer_Controller");
-const uploadOffer = require("../../middleware/upload")("offer");
+const uploadOffer = require("../../middleware/Upload.js")("offer");
 
 router.post(
   "/createoffer",
